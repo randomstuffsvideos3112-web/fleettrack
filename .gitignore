@@ -7,3 +7,7 @@ __pycache__/
 *.db-shm
 *.db-wal
 .claude/
+
+# local notes with secrets
+NEON.txt
+*.secret.txt
