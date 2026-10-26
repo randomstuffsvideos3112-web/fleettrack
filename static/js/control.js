@@ -689,6 +689,7 @@
     vehicle_created: 'Added vehicle', vehicle_updated: 'Edited vehicle',
     trip_started: 'Started trip', trip_ended: 'Ended trip', trip_force_ended: 'Ended trip (control)',
     overspeed_acknowledged: 'Acknowledged alert', report_exported: 'Exported report',
+    admin_password_reset_by_server: 'Admin password reset (server)',
   };
   async function loadAudit() {
     try {

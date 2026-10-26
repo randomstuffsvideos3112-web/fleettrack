@@ -13,7 +13,7 @@ from .config import settings
 from .db import Base, SessionLocal, engine
 from .models import User
 from .routers import admin, auth, trips
-from .security import hash_password
+from .security import audit, hash_password
 
 log = logging.getLogger("fleettrack")
 STATIC = Path(__file__).resolve().parent.parent / "static"
@@ -23,8 +23,10 @@ def bootstrap_admin() -> None:
     """Create the first control-room account when the database is empty."""
     with SessionLocal() as db:
         if db.scalar(select(func.count()).select_from(User)):
+            if settings.reset_admin_password:
+                reset_admin(db)
             return
-        password = settings.admin_password
+        password = settings.admin_password.strip()
         if not password:
             if settings.is_production:
                 raise RuntimeError("ADMIN_PASSWORD must be set for the first start in production.")
@@ -36,6 +38,26 @@ def bootstrap_admin() -> None:
                     role="admin", password_hash=hash_password(password),
                     must_change_password=not settings.admin_password))
         db.commit()
+
+
+def reset_admin(db) -> None:
+    """Recovery switch (RESET_ADMIN_PASSWORD=true): restore admin access from the server settings."""
+    password = settings.admin_password.strip()
+    if len(password) < 8:
+        log.error("RESET_ADMIN_PASSWORD is on but ADMIN_PASSWORD is missing or too short; nothing changed.")
+        return
+    username = settings.admin_username.strip().lower()
+    user = db.scalar(select(User).where(func.lower(User.username) == username))
+    if user is None:
+        user = User(username=username, full_name=settings.admin_full_name, role="admin", password_hash="")
+        db.add(user)
+    user.password_hash = hash_password(password)
+    user.role, user.active, user.must_change_password = "admin", True, False
+    user.token_version = (user.token_version or 0) + 1
+    db.flush()
+    audit(db, None, None, "admin_password_reset_by_server", "user", user.id, username)
+    db.commit()
+    log.warning("Admin password for '%s' was reset from server settings. Turn RESET_ADMIN_PASSWORD off now.", username)
 
 
 @asynccontextmanager

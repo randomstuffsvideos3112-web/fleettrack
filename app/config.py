@@ -22,6 +22,9 @@ class Settings:
     admin_username: str = os.getenv("ADMIN_USERNAME", "admin")
     admin_password: str = os.getenv("ADMIN_PASSWORD", "")
     admin_full_name: str = os.getenv("ADMIN_FULL_NAME", "Control Room")
+    # Recovery: when "true", the admin account's password is reset to ADMIN_PASSWORD on start-up.
+    # Turn it off again after signing in.
+    reset_admin_password: bool = os.getenv("RESET_ADMIN_PASSWORD", "").strip().lower() in ("1", "true", "yes")
 
     # How long a sign-in lasts. Drivers stay signed in longer so a trip is never interrupted.
     token_hours_admin: int = _int("TOKEN_HOURS_ADMIN", 12)
