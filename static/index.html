@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#060a13">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FleetTrack">
+  <title>FleetTrack · Sign in</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/static/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="/static/css/app.css">
+  <link rel="stylesheet" href="/static/css/login.css">
+</head>
+<body>
+  <div class="aurora"></div>
+  <div class="grid-bg"></div>
+
+  <main class="login-wrap">
+    <section class="login-hero">
+      <div class="brand brand-lg">
+        <span class="brand-mark" data-icon="pin"></span>
+        <span>FleetTrack<small>Vehicle tracking</small></span>
+      </div>
+      <h1>Every vehicle.<br><span class="grad-text">Every kilometre.</span></h1>
+      <p class="lead">See where your vehicles are, follow each trip and get overspeed alerts, from one control room.</p>
+      <ul class="feature-list">
+        <li><span data-icon="activity"></span>Live positions with moving, stopped and signal-lost status</li>
+        <li><span data-icon="route"></span>Trip history with route playback and distance</li>
+        <li><span data-icon="gauge"></span>Overspeed alerts that the control room acknowledges</li>
+        <li><span data-icon="cloud"></span>Points saved on the phone when there is no signal and uploaded later</li>
+      </ul>
+    </section>
+
+    <section class="login-card glass">
+      <form id="login-form" autocomplete="on" novalidate>
+        <h2>Sign in</h2>
+        <p class="sub">Use the account your control room gave you.</p>
+        <div id="login-error" class="form-error hidden" role="alert"></div>
+        <div class="field">
+          <label for="username">Username</label>
+          <div class="input-icon"><span data-icon="user"></span>
+            <input class="input" id="username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="input-icon"><span data-icon="lock"></span>
+            <input class="input" id="password" name="password" type="password" autocomplete="current-password" required>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-lg btn-block" type="submit" id="login-btn">Sign in</button>
+      </form>
+
+      <form id="change-form" class="hidden" novalidate>
+        <h2>Set your password</h2>
+        <p class="sub">Choose a new password before you continue. Use at least 8 characters with letters and numbers.</p>
+        <div id="change-error" class="form-error hidden" role="alert"></div>
+        <div class="field">
+          <label for="cur-pw">Current password</label>
+          <input class="input" id="cur-pw" type="password" autocomplete="current-password" required>
+        </div>
+        <div class="field">
+          <label for="new-pw">New password</label>
+          <input class="input" id="new-pw" type="password" autocomplete="new-password" minlength="8" required>
+        </div>
+        <div class="field">
+          <label for="new-pw2">Repeat new password</label>
+          <input class="input" id="new-pw2" type="password" autocomplete="new-password" minlength="8" required>
+        </div>
+        <button class="btn btn-primary btn-lg btn-block" type="submit" id="change-btn">Save and continue</button>
+        <button class="btn btn-ghost btn-block" type="button" id="change-cancel" style="margin-top:8px">Sign out</button>
+      </form>
+
+      <div id="install-hint" class="install-hint hidden"></div>
+    </section>
+  </main>
+
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/login.js"></script>
+</body>
+</html>

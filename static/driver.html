@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#060a13">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FleetTrack">
+  <title>FleetTrack · Driver</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/static/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="/static/css/app.css">
+  <link rel="stylesheet" href="/static/css/driver.css">
+</head>
+<body>
+  <div class="aurora"></div>
+
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" data-icon="pin"></span>
+        <span id="hello">FleetTrack<small>Driver</small></span>
+      </div>
+      <div class="top-actions">
+        <span id="net-pill" class="net-pill"></span>
+        <button class="btn btn-ghost icon-btn" id="menu-btn" aria-label="Menu" data-icon="menu"></button>
+      </div>
+    </header>
+
+    <!-- Pending uploads from an earlier trip -->
+    <div id="sync-banner" class="banner hidden"></div>
+
+    <!-- 1. Choose a vehicle -->
+    <section id="screen-select" class="screen hidden">
+      <div class="screen-head">
+        <h1>Start a trip</h1>
+        <p class="muted">Choose the vehicle you are driving.</p>
+      </div>
+      <div class="search-box input-icon">
+        <span data-icon="search"></span>
+        <input class="input" id="vehicle-search" placeholder="Search vehicle number" autocomplete="off">
+      </div>
+      <div id="vehicle-list" class="vehicle-list"></div>
+      <div class="sticky-cta">
+        <div class="field" style="margin-bottom:10px">
+          <input class="input" id="purpose" maxlength="200" placeholder="Purpose / destination (optional)">
+        </div>
+        <button class="btn btn-primary btn-lg btn-block" id="start-btn" disabled>
+          <span data-icon="play"></span><span id="start-label">Select a vehicle</span>
+        </button>
+      </div>
+      <div class="recent">
+        <h3>Recent trips</h3>
+        <div id="recent-list"></div>
+      </div>
+    </section>
+
+    <!-- 2. Trip in progress -->
+    <section id="screen-trip" class="screen hidden">
+      <div class="trip-head">
+        <div>
+          <div class="trip-vehicle" id="trip-vehicle">—</div>
+          <div class="muted small" id="trip-purpose"></div>
+        </div>
+        <span class="chip s-active" id="trip-state"><span class="dot"></span>Recording</span>
+      </div>
+
+      <div class="gauge-wrap">
+        <div class="gauge" id="gauge">
+          <svg viewBox="0 0 200 200" class="gauge-svg">
+            <defs>
+              <linearGradient id="g-ok" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#8b5cf6"/>
+              </linearGradient>
+              <linearGradient id="g-over" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0" stop-color="#fb923c"/><stop offset="1" stop-color="#f43f5e"/>
+              </linearGradient>
+            </defs>
+            <circle class="g-track" cx="100" cy="100" r="84"/>
+            <circle class="g-value" id="g-value" cx="100" cy="100" r="84"/>
+            <line class="g-limit" id="g-limit" x1="100" y1="10" x2="100" y2="24"/>
+          </svg>
+          <div class="gauge-center">
+            <div class="speed num" id="speed">0</div>
+            <div class="unit">km/h</div>
+            <div class="limit-pill" id="limit-pill">Limit —</div>
+          </div>
+        </div>
+        <div id="over-banner" class="over-banner hidden"><span data-icon="alert"></span>Slow down — over the speed limit</div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><span class="stat-label">Distance</span><span class="stat-value num"><span id="st-dist">0.00</span><small> km</small></span></div>
+        <div class="stat"><span class="stat-label">Duration</span><span class="stat-value num" id="st-time">00:00:00</span></div>
+        <div class="stat"><span class="stat-label">Top speed</span><span class="stat-value num"><span id="st-max">0</span><small> km/h</small></span></div>
+      </div>
+
+      <div class="status-list">
+        <div class="status-row"><span class="sr-icon" data-icon="crosshair"></span><span class="sr-label">GPS</span><span class="sr-value" id="st-gps">Waiting for signal…</span></div>
+        <div class="status-row"><span class="sr-icon" data-icon="upload"></span><span class="sr-label">Upload</span><span class="sr-value" id="st-sync">—</span></div>
+      </div>
+
+      <div class="keep-open" id="keep-open">
+        <span data-icon="info"></span>
+        <span>Keep this screen open while driving. If you lock the phone or switch apps, tracking pauses until you come back.</span>
+      </div>
+
+      <button class="btn btn-danger btn-lg btn-block end-btn" id="end-btn"><span data-icon="stop"></span>End trip</button>
+    </section>
+
+    <!-- 3. Trip summary -->
+    <section id="screen-summary" class="screen hidden">
+      <div class="summary glass">
+        <div class="summary-icon"><span data-icon="flag"></span></div>
+        <h1>Trip complete</h1>
+        <p class="muted" id="sum-sub"></p>
+        <div class="stats">
+          <div class="stat"><span class="stat-label">Distance</span><span class="stat-value num" id="sum-dist">—</span></div>
+          <div class="stat"><span class="stat-label">Duration</span><span class="stat-value num" id="sum-time">—</span></div>
+          <div class="stat"><span class="stat-label">Top speed</span><span class="stat-value num" id="sum-max">—</span></div>
+        </div>
+        <div id="sum-alert" class="hidden over-note"></div>
+        <button class="btn btn-primary btn-lg btn-block" id="sum-done">Done</button>
+      </div>
+    </section>
+
+    <!-- GPS permission problem -->
+    <section id="screen-gps" class="screen hidden">
+      <div class="summary glass">
+        <div class="summary-icon warn"><span data-icon="pin"></span></div>
+        <h1>Location is blocked</h1>
+        <p class="muted">FleetTrack needs your location to record the trip.</p>
+        <div class="howto" id="gps-howto"></div>
+        <button class="btn btn-primary btn-lg btn-block" id="gps-retry">Try again</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="loading" class="loading-screen"><div class="spinner" style="width:32px;height:32px"></div></div>
+
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/driver.js"></script>
+</body>
+</html>

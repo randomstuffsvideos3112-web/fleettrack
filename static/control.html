@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#060a13">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FleetTrack">
+  <title>FleetTrack · Control</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/static/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="/static/css/app.css">
+  <link rel="stylesheet" href="/static/css/control.css">
+</head>
+<body>
+  <div class="shell">
+    <nav class="sidebar">
+      <div class="brand side-brand">
+        <span class="brand-mark" data-icon="pin"></span>
+        <span class="brand-text">FleetTrack<small>Control room</small></span>
+      </div>
+      <a class="nav-item" href="#live" data-view="live"><span data-icon="map"></span><span>Live map</span></a>
+      <a class="nav-item" href="#trips" data-view="trips"><span data-icon="route"></span><span>Trips</span></a>
+      <a class="nav-item" href="#alerts" data-view="alerts"><span data-icon="bell"></span><span>Alerts</span><span class="badge hidden" id="alert-badge">0</span></a>
+      <a class="nav-item" href="#vehicles" data-view="vehicles"><span data-icon="truck"></span><span>Vehicles</span></a>
+      <a class="nav-item" href="#people" data-view="people"><span data-icon="users"></span><span>People</span></a>
+      <a class="nav-item nav-desktop" href="#audit" data-view="audit"><span data-icon="shield"></span><span>Audit log</span></a>
+      <div class="side-foot">
+        <button class="me-btn" id="me-btn">
+          <span class="avatar" id="me-avatar">A</span>
+          <span class="me-text"><b id="me-name">—</b><small>Administrator</small></span>
+        </button>
+      </div>
+    </nav>
+
+    <main class="main">
+      <!-- LIVE -->
+      <section class="view view-live" id="view-live">
+        <div id="map" class="map"></div>
+
+        <div class="fleet-panel glass" id="fleet-panel">
+          <div class="fp-handle" id="fp-handle"></div>
+          <div class="fp-head">
+            <div>
+              <h2>Fleet</h2>
+              <div class="fp-updated muted" id="fp-updated">Loading…</div>
+            </div>
+            <button class="btn btn-ghost btn-sm icon-btn" id="fit-btn" title="Show all vehicles" data-icon="target"></button>
+          </div>
+          <div class="summary-row" id="summary-row"></div>
+          <div class="input-icon fp-search"><span data-icon="search"></span>
+            <input class="input" id="fleet-search" placeholder="Search vehicle or driver" autocomplete="off">
+          </div>
+          <div class="fleet-list" id="fleet-list"></div>
+        </div>
+
+        <div class="v-card-float glass hidden" id="v-float"></div>
+        <a href="#alerts" class="alert-float hidden" id="alert-float"></a>
+      </section>
+
+      <!-- TRIPS -->
+      <section class="view page hidden" id="view-trips">
+        <header class="page-head">
+          <div><h1>Trips</h1><p class="muted">Every journey recorded by your drivers.</p></div>
+          <button class="btn" id="trips-export" data-icon="download">Export CSV</button>
+        </header>
+        <div class="filters glass">
+          <select class="input" id="f-vehicle"><option value="">All vehicles</option></select>
+          <select class="input" id="f-driver"><option value="">All drivers</option></select>
+          <select class="input" id="f-status"><option value="">Any status</option><option value="active">Active</option><option value="ended">Ended</option></select>
+          <input class="input" type="date" id="f-from" title="From date">
+          <input class="input" type="date" id="f-to" title="To date">
+          <button class="btn btn-primary" id="f-apply">Apply</button>
+        </div>
+        <div class="kpis" id="trip-kpis"></div>
+        <div class="table-wrap"><table class="table"><thead><tr>
+          <th>Vehicle</th><th>Driver</th><th>Started</th><th>Duration</th><th>Distance</th><th>Top speed</th><th>Alerts</th><th>Status</th>
+        </tr></thead><tbody id="trips-body"></tbody></table></div>
+      </section>
+
+      <!-- ALERTS -->
+      <section class="view page hidden" id="view-alerts">
+        <header class="page-head">
+          <div><h1>Overspeed alerts</h1><p class="muted">Review each alert and acknowledge it once handled.</p></div>
+          <div class="head-actions">
+            <div class="seg" id="alert-seg"><button class="on" data-v="open">Open</button><button data-v="all">All</button></div>
+            <button class="btn" id="alerts-export" data-icon="download">Export</button>
+          </div>
+        </header>
+        <div class="alert-grid" id="alert-list"></div>
+      </section>
+
+      <!-- VEHICLES -->
+      <section class="view page hidden" id="view-vehicles">
+        <header class="page-head">
+          <div><h1>Vehicles</h1><p class="muted">Your vehicle register, with each vehicle's speed limit.</p></div>
+          <button class="btn btn-primary" id="add-vehicle" data-icon="plus">Add vehicle</button>
+        </header>
+        <div class="table-wrap"><table class="table"><thead><tr>
+          <th>Vehicle</th><th>Type</th><th>Speed limit</th><th>Assigned driver</th><th>Status</th><th></th>
+        </tr></thead><tbody id="vehicles-body"></tbody></table></div>
+      </section>
+
+      <!-- PEOPLE -->
+      <section class="view page hidden" id="view-people">
+        <header class="page-head">
+          <div><h1>People</h1><p class="muted">Each driver and controller has their own sign-in.</p></div>
+          <button class="btn btn-primary" id="add-user" data-icon="plus">Add person</button>
+        </header>
+        <div class="table-wrap"><table class="table"><thead><tr>
+          <th>Name</th><th>Username</th><th>Role</th><th>Phone</th><th>Last sign-in</th><th>Status</th><th></th>
+        </tr></thead><tbody id="people-body"></tbody></table></div>
+      </section>
+
+      <!-- AUDIT -->
+      <section class="view page hidden" id="view-audit">
+        <header class="page-head">
+          <div><h1>Audit log</h1><p class="muted">Who did what, and when. Entries cannot be edited.</p></div>
+          <button class="btn" id="audit-refresh" data-icon="refresh">Refresh</button>
+        </header>
+        <div class="table-wrap"><table class="table"><thead><tr>
+          <th>Time</th><th>Person</th><th>Action</th><th>Details</th><th>Address</th>
+        </tr></thead><tbody id="audit-body"></tbody></table></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/control.js"></script>
+</body>
+</html>

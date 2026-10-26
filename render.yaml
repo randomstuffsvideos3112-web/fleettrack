@@ -1,0 +1,19 @@
+# Render "Blueprint": creates the FleetTrack web service from this repository.
+# The database is a free Neon PostgreSQL (Render's own free database expires after 30 days).
+services:
+  - type: web
+    name: fleettrack
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false        # paste your Neon connection string when Render asks
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        sync: false        # choose a strong password when Render asks
